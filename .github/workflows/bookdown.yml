@@ -1,0 +1,43 @@
+name: Build and Deploy bookdown (gitbook)
+
+# trigger on pushes to main (change branch name if you use something else)
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install R packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            bookdown
+            knitr
+            rmarkdown
+            xfun
+
+      - name: Build book via Rscript
+        # try `make`, then `make gitbook`, then fallback to bookdown::render_book;
+        # if all fail the step will fail and Actions will show the logs.
+        run: |
+          Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
+
+      - name: Deploy to GitHub Pages (gh-pages branch)
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: _book
+          token: ${{ secrets.GITHUB_TOKEN }}
