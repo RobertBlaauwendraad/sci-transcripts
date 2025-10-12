@@ -33,6 +33,8 @@ jobs:
             ellipse
             numDeriv
             pROC
+            igraph
+            manynet
 
       - name: Build book via Rscript
         # try `make`, then `make gitbook`, then fallback to bookdown::render_book;
